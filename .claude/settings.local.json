@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(pip --version)",
-      "Bash(.\\\\.venv\\\\Scripts\\\\pip.exe --version)"
+      "Bash(.\\\\.venv\\\\Scripts\\\\pip.exe --version)",
+      "Bash(.venv\\\\Scripts\\\\pip freeze *)"
     ]
   }
 }

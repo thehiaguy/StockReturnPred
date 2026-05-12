@@ -18,7 +18,7 @@ Pulling historical price data with yfinance, creating features like moving avera
 
 ### Linear Regression (from scratch)
 - Implemented using the Normal Equation instead of gradient descent since the dataset is small-to-medium sized.
-- The Normal Equation solves for optimal weights in one shot: theta = (X^T X)^-1 X^T y
+- The Normal Equation solves for optimal weights in one shot: `θ = (XᵀX)⁻¹ Xᵀy`
 - Added a bias column of ones to X so the model learns an intercept alongside the lag weights.
 - Evaluated using MSE (Mean Squared Error) and R-squared.
 
@@ -37,7 +37,7 @@ Pulling historical price data with yfinance, creating features like moving avera
 ### Install dependencies
 
 ```bash
-pip install yfinance pandas numpy matplotlib seaborn scikit-learn xgboost
+pip install -r requirement.txt
 ```
 
 ### Run the notebook
