@@ -37,9 +37,9 @@ Pulling historical price data with yfinance, creating features like moving avera
 ### XGBoost (C++ from scratch + sklearn)
 - Implemented in C++ using the XGBoost structure score gain criterion, compiled as a Python extension via pybind11.
 - Builds trees sequentially — each tree corrects the residual errors of the ensemble so far, unlike Random Forest which builds trees in parallel.
-- The C++ implementation scored Test R² 0.140, close to sklearn's 0.152 — validates the implementation is correct.
-- **Same conclusion as Random Forest:** Train R² of 0.936 vs Test R² of 0.152 is severe overfitting. Linear regression (0.309) still wins on this small dataset.
-- The consistent finding across all tree-based models is that ~220 rows is simply too small for complex models to generalise.
+- The C++ implementation scored Test R² 0.383, close to sklearn's 0.381 — validates the implementation is correct.
+- **Same conclusion as Random Forest:** Train R² of 0.788 vs Test R² of 0.383 is notable overfitting. Linear regression (0.496) still wins on this dataset.
+- The consistent finding across all tree-based models is that linear regression with well-engineered features generalises better on this dataset.
 
 ### Backtesting
 - Converted linear regression predictions into a long/short trading strategy using `np.sign()` — +1 (buy) when predicting positive returns, -1 (short) when predicting negative.
@@ -58,11 +58,12 @@ Pulling historical price data with yfinance, creating features like moving avera
 
 | Model | MSE | Test R² | Train R² |
 |-------|-----|---------|---------|
-| Linear Regression | 0.000145 | 0.3092 | 0.5256 |
-| RF from scratch (grid search) | 0.000199 | 0.0575 | 0.6082 |
-| sklearn RandomForest | 0.000192 | 0.0896 | 0.6824 |
-| C++ XGBoost | 0.000181 | 0.1400 | 0.9361 |
-| sklearn XGBoost | 0.000179 | 0.1519 | 0.9379 |
+| Linear Regression | 0.000110 | 0.4958 | 0.4649 |
+| RF from scratch | 0.000172 | 0.2133 | 0.4409 |
+| RF grid search | 0.000168 | 0.2281 | 0.4012 |
+| sklearn RandomForest | 0.000153 | 0.3001 | 0.5398 |
+| C++ XGBoost | 0.000135 | 0.3831 | 0.7877 |
+| sklearn XGBoost | 0.000135 | 0.3807 | 0.7799 |
 
 ### Backtesting (Linear Regression Strategy, 1-year dataset)
 
