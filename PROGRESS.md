@@ -38,7 +38,20 @@ Predicting next-day returns for AAPL stock using machine learning. Data is pulle
 20. Feature weights (theta) printout
 21. Train vs Test R² overfitting check
 22. Actual vs Predicted returns plot
-23. Conclusions markdown
+23. Linear Regression conclusions markdown
+24. Random Forest from scratch markdown (explains Node, DecisionTree, RandomForest)
+25. Random Forest from scratch implementation (cell `de08afea`)
+26. Random Forest evaluation (cell `d877c97e`)
+27. Hyperparameter Tuning markdown (explains grid search + validation set)
+28. Grid search + best RF retrain + evaluation (cell `0951f941`)
+29. sklearn RF comparison markdown
+30. sklearn RandomForestRegressor evaluation (cell `08e99d08`)
+31. Random Forest conclusions markdown
+32. XGBoost from scratch markdown (boosting loop, split criterion, structure score)
+33. C++ XGBoost evaluation (cell `f3e250f7`)
+34. sklearn XGBRegressor comparison markdown
+35. sklearn XGBRegressor evaluation (cell `a1062688`)
+36. XGBoost conclusions markdown
 
 ---
 
@@ -81,6 +94,43 @@ def linear_regression(X, y):
     return theta
 ```
 
+### Random Forest (from scratch)
+Implemented three classes: `Node`, `DecisionTree`, `RandomForest`.
+
+Key implementation details:
+- Each tree trained on a bootstrap sample: `idxs = np.random.choice(len(X), len(X), replace=True)`
+- Each split considers `int(np.sqrt(X.shape[1]))` = 2 random features (keeps trees decorrelated)
+- Split criterion: weighted MSE = `(len(left)*var(left) + len(right)*var(right)) / n`
+- Leaf prediction: `np.mean(y)` of all samples that reached that leaf
+- Prediction: average across all trees via `np.mean([tree.predict(X) for tree in self.trees], axis=0)`
+- Hyperparameters tuned via grid search on a validation set (last 20% of training data)
+- Best params found: `max_depth=5`, `min_samples_split=10`
+
+### sklearn RandomForestRegressor
+- Same hyperparameters as from-scratch for fair comparison
+- `random_state=42` for reproducibility
+
+### XGBoost (C++ from scratch)
+Implemented in `libraries/xgboost_scratch.cpp`, compiled as a Python extension via pybind11 and imported as `XGBoostCpp`.
+
+Key implementation details:
+- **Boosting loop:** starts from `F_0 = mean(y)`, each round fits a tree to the first-order gradients `g_i = F(x_i) - y_i` and constant hessians `h_i = 1` (MSE loss)
+- **Split criterion:** maximises XGBoost structure score gain: `0.5*(G_L²/(H_L+λ) + G_R²/(H_R+λ) - G²/(H+λ)) - γ`
+- **Leaf value:** optimal weight `w* = -G/(H+λ)` derived from the second-order Taylor expansion
+- **Column-major XGBMatrix:** feature columns stored contiguously — cache-friendly for the split-finding inner loop
+- **Pre-sorted indices:** `sorted_idx[f]` built once before training; every node reuses it (O(n_total) scan vs O(n_node log n_node) re-sort per node)
+- **OpenMP parallelism:** `#pragma omp parallel for` over the feature loop — features are independent so no synchronisation needed; each thread writes to its own `alignas(64)` SplitResult slot to prevent false sharing
+
+Build system:
+- `libraries/build.bat` — runs the full g++ command, copies `.pyd` to `notebooks/`
+- Compile command: `C:\msys64\ucrt64\bin\g++ -O3 -march=native -fopenmp -std=c++17 -shared -DXGB_EXTENSION ...`
+- The `-DXGB_EXTENSION` flag enables the pybind11 block and disables `main()`
+- `os.add_dll_directory(r"C:\msys64\ucrt64\bin")` must be called before the import to resolve MSYS2 runtime DLLs
+
+### sklearn XGBRegressor
+- Same hyperparameters as C++ version for fair comparison (`n_estimators=100`, `learning_rate=0.1`, `max_depth=3`)
+- `random_state=42` for reproducibility
+
 ### Data Pipeline
 ```python
 history = history[['Close', 'Return'] + feature_cols].dropna()
@@ -94,27 +144,32 @@ y_train, y_test = y[:split], y[split:]
 
 ---
 
-## Current Results (Linear Regression)
+## Current Results
 
-| Metric | Value |
-|--------|-------|
-| MSE | 0.000145 |
-| Test R² | 0.3092 |
-| Train R² | 0.5256 |
+| Model | MSE | Test R² | Train R² |
+|-------|-----|---------|---------|
+| Linear Regression | 0.000145 | 0.3092 | 0.5256 |
+| RF from scratch (grid search) | 0.000199 | 0.0575 | 0.6082 |
+| sklearn RandomForest | 0.000192 | 0.0896 | 0.6824 |
+| C++ XGBoost | 0.000181 | 0.1400 | 0.9361 |
+| sklearn XGBoost | 0.000179 | 0.1519 | 0.9379 |
 
-The gap between train and test R² (0.52 vs 0.31) indicates mild overfitting — expected given the small dataset (~220 rows after dropna). Linear regression has no built-in overfitting controls.
+---
 
-### Feature Weights (theta)
-```
-Lag1:            -0.418704   (mean reversion signal)
-Lag2:            -0.498672   (mean reversion signal)
-Lag3:            -0.582546   (mean reversion signal)
-Vol_5day:         0.298715   (positive — higher vol predicts higher return)
-Vol_30day:       -0.417566   (negative — high long term vol predicts lower return)
-Momentum_5days:   2.420970   (strongest feature — short term trend continuation)
-Momentum_30days:  0.432776   (positive — long term trend continuation)
-SMA_Ratio:       -0.010483   (near zero — dropped)
-```
+## What Went Well This Session
+
+- **C++ XGBoost implementation validated.** The from-scratch C++ version scored Test R² 0.140 vs sklearn's 0.152 — only an 8% gap, much closer than the RF from-scratch vs sklearn gap. This confirms the implementation is correct.
+- **pybind11 extension compiled and working.** `xgboost_scratch.cpp` successfully compiled into a `.pyd` file and imported as `XGBoostCpp` in the notebook using `os.add_dll_directory` to resolve MSYS2 runtime DLLs.
+- **build.bat created for one-command rebuilds.** All paths hardcoded so it works from any terminal without needing g++ on PATH or activating the venv.
+- **Consistent finding across all models.** Linear regression (Test R² 0.309) outperforms all tree-based models on this dataset. This is a real and meaningful result — not a failure — confirming that dataset size is the binding constraint, not the model.
+- **Visualizations added after every model.** Actual vs predicted plots now appear after each model's MSE/R² output for easy comparison.
+
+## What Did Not Go Well This Session
+
+- **Build process was painful on Windows.** Multiple issues encountered: PowerShell comma-parsing breaking `-Wl,--enable-auto-import`, `g++` not on PATH, `python` pointing to system Python instead of venv, `--- stderr ---` printed with no content (g++ errors swallowed by subprocess capture). Resolved by using `build.bat` via `cmd /c` and running g++ directly.
+- **DLL load failed on first import.** The `.pyd` compiled successfully but Python couldn't find MSYS2 runtime DLLs (`libgomp`, `libgcc`). Fixed with `os.add_dll_directory(r"C:\msys64\ucrt64\bin")` before the import.
+- **XGBoost also failed to beat linear regression.** Train R² of 0.936 vs Test R² of 0.152 — the most severe overfitting of any model. The sequential boosting loop memorises the training data almost perfectly but the small dataset means those patterns don't hold on the test set.
+- **File split into headers was reverted.** Attempted to split `xgboost_scratch.cpp` into multiple header files (`xgboost_matrix.hpp`, `xgboost_tree.hpp`, etc.) but added complexity without benefit. Reverted to the single-file approach.
 
 ---
 
@@ -125,29 +180,18 @@ SMA_Ratio:       -0.010483   (near zero — dropped)
 - **Chronological train/test split** used (not random) since time series data must not be shuffled
 - **Normal Equation** used instead of gradient descent — dataset is small enough that it is faster and exact
 - **`dropna()` done once at the end** after all features are built, not in individual cells
+- **Validation set for grid search** carved from the last 20% of training data, not from the test set
+- **Single-file C++ kept** over multi-header split — pybind11 extension only needs one source file to compile, splitting added no practical benefit
+- **`os.add_dll_directory` used at import time** rather than adding MSYS2 to system PATH — keeps the environment clean
 
 ---
 
 ## What Is Next
 
-### 1. Random Forest
-- Import from `sklearn.ensemble import RandomForestRegressor`
-- Use the same `X_train`, `X_test`, `y_train`, `y_test`
-- Key hyperparameters to tune: `n_estimators`, `max_depth`, `min_samples_split`
-- Compare MSE and R² against linear regression baseline
-- Check train vs test R² gap to assess overfitting
+### 1. Model Comparison Plot
+- Plot actual vs predicted returns for all models on one chart
 
-### 2. XGBoost
-- Import from `xgboost import XGBRegressor`
-- Same feature set and train/test split
-- Key hyperparameters: `n_estimators`, `learning_rate`, `max_depth`
-- Compare against both linear regression and random forest
-
-### 3. Model Comparison
-- Side by side table of MSE and R² for all three models
-- Plot actual vs predicted for each model on the same chart
-
-### 4. Backtesting (stretch goal)
+### 2. Backtesting
 - When model predicts positive return → go long (buy)
 - When model predicts negative return → go short (sell)
 - Compare cumulative strategy returns vs buy and hold
@@ -161,4 +205,10 @@ SMA_Ratio:       -0.010483   (near zero — dropped)
 - All feature engineering happens in cell `3e5846ca` before the `dropna()`
 - The `8374d676` cell is just a display/sanity check — it does not save the result back to `history`
 - Visualizations (vol, momentum, SMA ratio plots) come before the model cells
-- Model cells start at `eced3c42`
+- Linear regression model cells start at `eced3c42`
+- Random Forest implementation is in cell `de08afea` — must be run before the evaluation and grid search cells
+- `self.trees = []` is set in `RandomForest.__init__` — if `fit` is called twice on the same instance it will keep appending trees. Always instantiate a fresh `RandomForest` object before fitting.
+- To rebuild the C++ extension: run `.\libraries\build.bat` from the project root — it compiles and copies the `.pyd` to `notebooks/` automatically
+- The `.pyd` filename is `xgboost_cpp.cp314-win_amd64.pyd` (Python 3.14 specific)
+- Always call `os.add_dll_directory(r"C:\msys64\ucrt64\bin")` before `from xgboost_cpp import XGBoostCpp` or it will throw `ImportError: DLL load failed`
+- C++ XGBoost cells start at `f3e250f7` — must have the `.pyd` in `notebooks/` before running

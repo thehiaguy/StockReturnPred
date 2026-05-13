@@ -31,18 +31,27 @@ Pulling historical price data with yfinance, creating features like moving avera
 - Built from scratch using three classes: `Node`, `DecisionTree`, and `RandomForest`.
 - Each tree is trained on a bootstrap sample (random rows with replacement) and considers only `int(sqrt(n_features))` features per split — this keeps trees decorrelated.
 - Hyperparameters (`max_depth`, `min_samples_split`) were tuned using grid search on a held-out validation set carved from the training data, not the test set.
-- sklearn's `RandomForestRegressor` outperformed the from-scratch version (Test R² 0.15 vs 0.09) due to more optimised internal splitting logic.
+- sklearn's `RandomForestRegressor` outperformed the from-scratch version (Test R² 0.09 vs 0.06) due to more optimised internal splitting logic.
 - **Linear regression still beat all RF variants** on this dataset — with only ~220 rows, there is not enough data for trees to find reliable non-linear patterns that generalise.
+
+### XGBoost (C++ from scratch + sklearn)
+- Implemented in C++ using the XGBoost structure score gain criterion, compiled as a Python extension via pybind11.
+- Builds trees sequentially — each tree corrects the residual errors of the ensemble so far, unlike Random Forest which builds trees in parallel.
+- The C++ implementation scored Test R² 0.140, close to sklearn's 0.152 — validates the implementation is correct.
+- **Same conclusion as Random Forest:** Train R² of 0.936 vs Test R² of 0.152 is severe overfitting. Linear regression (0.309) still wins on this small dataset.
+- The consistent finding across all tree-based models is that ~220 rows is simply too small for complex models to generalise.
 
 ---
 
-## Results So Far
+## Results
 
 | Model | MSE | Test R² | Train R² |
 |-------|-----|---------|---------|
 | Linear Regression | 0.000145 | 0.3092 | 0.5256 |
-| RF from scratch (grid search) | 0.000192 | 0.0861 | 0.5915 |
-| sklearn RandomForest | 0.000180 | 0.1468 | 0.6747 |
+| RF from scratch (grid search) | 0.000199 | 0.0575 | 0.6082 |
+| sklearn RandomForest | 0.000192 | 0.0896 | 0.6824 |
+| C++ XGBoost | 0.000181 | 0.1400 | 0.9361 |
+| sklearn XGBoost | 0.000179 | 0.1519 | 0.9379 |
 
 ---
 
@@ -77,9 +86,8 @@ jupyter notebook notebooks/main.ipynb
 ### Models
 - [x] Linear Regression — Normal Equation, from scratch (baseline)
 - [x] Random Forest — from scratch + sklearn comparison + grid search hyperparameter tuning
-- [ ] XGBoost — gradient boosted trees, expected to handle small datasets better than RF
+- [x] XGBoost — C++ from scratch (pybind11 extension) + sklearn comparison
 
 ### Evaluation
-- [ ] Compare MSE and R-squared across all three models in a final summary
-- [ ] Plot predicted vs actual returns for each model
+- [ ] Plot predicted vs actual returns for all models on one chart
 - [ ] Backtest a long/short strategy against buy and hold

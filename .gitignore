@@ -2,6 +2,11 @@
 .venv
 venv
 
+#vscode
+.vscode
+
+#exe
+*.exe
 
 #others
 lab03 - run_Zach_Peng.ipynb

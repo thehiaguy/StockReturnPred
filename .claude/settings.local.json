@@ -3,7 +3,29 @@
     "allow": [
       "Bash(pip --version)",
       "Bash(.\\\\.venv\\\\Scripts\\\\pip.exe --version)",
-      "Bash(.venv\\\\Scripts\\\\pip freeze *)"
+      "Bash(.venv\\\\Scripts\\\\pip freeze *)",
+      "Bash(where cl *)",
+      "Bash(where g++)",
+      "Bash(where clang++)",
+      "Bash(export PATH=\"$PATH:/c/msys64/mingw64/bin\")",
+      "Bash(g++ --version)",
+      "Bash(export PATH=\"/c/msys64/ucrt64/bin:$PATH\")",
+      "Bash(g++ -O3 -march=native -fopenmp -std=c++17 xgboost_scratch.cpp -o xgboost.exe)",
+      "Bash(./xgboost.exe)",
+      "PowerShell(C:\\\\Users\\\\zp123_2zkvvkz\\\\projects\\\\StockReturnPred\\\\.venv\\\\Scripts\\\\python.exe -c \"import pybind11; print\\(pybind11.get_include\\(\\)\\)\")",
+      "Bash(C:/msys64/ucrt64/bin/g++ -O3 -march=native -fopenmp -std=c++17 -shared -DXGB_EXTENSION -IC:/Users/zp123_2zkvvkz/projects/StockReturnPred/.venv/Lib/site-packages/pybind11/include -IC:/Users/zp123_2zkvvkz/AppData/Local/Programs/Python/Python314/Include libraries/xgboost_scratch.cpp -olibraries/xgboost_cpp.cp314-win_amd64.pyd -LC:/Users/zp123_2zkvvkz/AppData/Local/Programs/Python/Python314/libs -lpython314 -Wl,--enable-auto-import)",
+      "Bash(C:/msys64/ucrt64/bin/g++ -O3 -march=native -fopenmp -std=c++17 -shared -DXGB_EXTENSION -IC:/Users/zp123_2zkvvkz/projects/StockReturnPred/.venv/Lib/site-packages/pybind11\\\\include -IC:/Users/zp123_2zkvvkz/AppData/Local/Programs/Python/Python314/Include libraries/xgboost_scratch.cpp -olibraries/xgboost_cpp.cp314-win_amd64.pyd -LC:/Users/zp123_2zkvvkz/AppData/Local/Programs/Python/Python314/libs -lpython314 -Wl,--enable-auto-import)",
+      "Bash(C:/msys64/ucrt64/bin/g++ --version)",
+      "Bash(C:/msys64/ucrt64/bin/g++ -std=c++17 -DXGB_EXTENSION -IC:/Users/zp123_2zkvvkz/projects/StockReturnPred/.venv/Lib/site-packages/pybind11/include -IC:/Users/zp123_2zkvvkz/AppData/Local/Programs/Python/Python314/Include -c libraries/xgboost_scratch.cpp -o /tmp/test.o)",
+      "Bash(echo \"exit: $?\")",
+      "Read(//tmp/**)",
+      "Bash(echo '#include *)",
+      "Bash(C:/msys64/ucrt64/bin/g++ /tmp/test.cpp -o /tmp/test_out)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Get-Item *)",
+      "PowerShell(cd C:\\\\Users\\\\zp123_2zkvvkz\\\\projects\\\\StockReturnPred; cmd /c \"C:\\\\msys64\\\\ucrt64\\\\bin\\\\g++ -std=c++17 -DXGB_EXTENSION -IC:\\\\Users\\\\zp123_2zkvvkz\\\\projects\\\\StockReturnPred\\\\.venv\\\\Lib\\\\site-packages\\\\pybind11\\\\include -IC:\\\\Users\\\\zp123_2zkvvkz\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Include -c libraries\\\\xgboost_scratch.cpp -o libraries\\\\test.o 2> %USERPROFILE%\\\\err2.txt\" ; type $env:USERPROFILE\\\\err2.txt)",
+      "PowerShell(Copy-Item *)"
     ]
   }
 }
