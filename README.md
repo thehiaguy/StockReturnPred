@@ -41,6 +41,17 @@ Pulling historical price data with yfinance, creating features like moving avera
 - **Same conclusion as Random Forest:** Train R² of 0.936 vs Test R² of 0.152 is severe overfitting. Linear regression (0.309) still wins on this small dataset.
 - The consistent finding across all tree-based models is that ~220 rows is simply too small for complex models to generalise.
 
+### Backtesting
+- Converted linear regression predictions into a long/short trading strategy using `np.sign()` — +1 (buy) when predicting positive returns, -1 (short) when predicting negative.
+- Strategy returns = signal × actual return each day. Correct shorts flip a loss into a gain by multiplying −1 × negative return.
+- Cumulative portfolio value tracked using `np.cumprod(1 + strategy_returns)` and compared against a buy-and-hold benchmark.
+- **Result:** strategy returned ~40% over the test period vs ~15% for buy-and-hold AAPL.
+
+### Strategy Metrics
+- **Beta = 0.38** against the S&P 500 — the strategy moves at only 38% of market swings, meaning most returns come from stock-specific signals (momentum, volatility) rather than just riding the market. Low beta combined with high returns implies genuine alpha.
+- **Daily Sharpe Ratio = 0.58** — in the "good" range (0.5–1.0). Return per unit of risk is solid for a simple daily strategy.
+- **Annualized Sharpe = 9.2** — artificially inflated by the tiny ~45 day test set. With only 45 observations, a good run with low volatility produces extreme annualized numbers. The daily Sharpe is the more honest figure until the dataset is expanded.
+
 ---
 
 ## Results
@@ -52,6 +63,16 @@ Pulling historical price data with yfinance, creating features like moving avera
 | sklearn RandomForest | 0.000192 | 0.0896 | 0.6824 |
 | C++ XGBoost | 0.000181 | 0.1400 | 0.9361 |
 | sklearn XGBoost | 0.000179 | 0.1519 | 0.9379 |
+
+### Backtesting (Linear Regression Strategy, 1-year dataset)
+
+| Metric | Value |
+|--------|-------|
+| Strategy return | ~40% |
+| Buy-and-hold return | ~15% |
+| Beta vs S&P 500 | 0.38 |
+| Daily Sharpe Ratio | 0.58 |
+| Annualized Sharpe | 9.2 (inflated — only 45 test days) |
 
 ---
 
@@ -89,5 +110,12 @@ jupyter notebook notebooks/main.ipynb
 - [x] XGBoost — C++ from scratch (pybind11 extension) + sklearn comparison
 
 ### Evaluation
-- [ ] Plot predicted vs actual returns for all models on one chart
-- [ ] Backtest a long/short strategy against buy and hold
+- [x] Plot predicted vs actual returns for all models
+- [x] Backtest a long/short strategy against buy-and-hold benchmark
+- [x] Beta against S&P 500
+- [x] Sharpe Ratio (daily and annualized)
+
+### Next Steps
+- [ ] Expand dataset from 1 year to 5 years (`period='5y'`) — increases training rows from ~175 to ~1,000 and test days from ~45 to ~250, making all metrics statistically meaningful
+- [ ] Re-evaluate all models on the larger dataset — tree-based models may close the gap with linear regression given more data
+- [ ] Re-run backtesting metrics on the larger test set for a reliable annualized Sharpe
