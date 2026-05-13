@@ -27,7 +27,8 @@
       "PowerShell(cd C:\\\\Users\\\\zp123_2zkvvkz\\\\projects\\\\StockReturnPred; cmd /c \"C:\\\\msys64\\\\ucrt64\\\\bin\\\\g++ -std=c++17 -DXGB_EXTENSION -IC:\\\\Users\\\\zp123_2zkvvkz\\\\projects\\\\StockReturnPred\\\\.venv\\\\Lib\\\\site-packages\\\\pybind11\\\\include -IC:\\\\Users\\\\zp123_2zkvvkz\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python314\\\\Include -c libraries\\\\xgboost_scratch.cpp -o libraries\\\\test.o 2> %USERPROFILE%\\\\err2.txt\" ; type $env:USERPROFILE\\\\err2.txt)",
       "PowerShell(Copy-Item *)",
       "Bash(pip install *)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(python3)"
     ]
   }
 }

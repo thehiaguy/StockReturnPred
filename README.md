@@ -76,11 +76,25 @@ Pulling historical price data with yfinance, creating features like moving avera
 
 ---
 
+## Notebook Structure
+
+The project is split into three notebooks that must be run in order. Each notebook saves its output to `data/` so the next one can load it without re-running everything.
+
+| Notebook | Description | Saves |
+|----------|-------------|-------|
+| `notebooks/01_eda.ipynb` | Data loading, SMA/EMA, feature engineering, visualizations | `data/features.csv` |
+| `notebooks/02_models.ipynb` | Train/test split, linear regression, random forest, XGBoost | `data/predictions.csv` |
+| `notebooks/03_backtesting.ipynb` | Long/short strategy, equity curve, beta, Sharpe ratio | — |
+
+---
+
 ## Environment Setup
 
 ### Requirements
 - Python 3.10+
 - Jupyter Notebook or JupyterLab
+- g++ (for compiling the C++ XGBoost extension)
+- pybind11 (`pip install pybind11`)
 
 ### Install dependencies
 
@@ -88,10 +102,25 @@ Pulling historical price data with yfinance, creating features like moving avera
 pip install -r requirement.txt
 ```
 
-### Run the notebook
+### Build the C++ XGBoost extension (macOS)
 
 ```bash
-jupyter notebook notebooks/main.ipynb
+cd libraries
+PYBIND=$(python -c "import pybind11; print(pybind11.get_include())")
+PYINC=$(python -c "import sysconfig; print(sysconfig.get_path('include'))")
+SUFFIX=$(python -c "import sysconfig; print(sysconfig.get_config_var('EXT_SUFFIX'))")
+g++ -O3 -march=native -std=c++17 -shared -fPIC -undefined dynamic_lookup \
+    -DXGB_EXTENSION -I$PYBIND -I$PYINC \
+    xgboost_scratch.cpp -o ../notebooks/xgboost_cpp$SUFFIX
+cd ..
+```
+
+### Run the notebooks in order
+
+```bash
+jupyter notebook notebooks/01_eda.ipynb
+jupyter notebook notebooks/02_models.ipynb
+jupyter notebook notebooks/03_backtesting.ipynb
 ```
 
 ---
@@ -114,6 +143,10 @@ jupyter notebook notebooks/main.ipynb
 - [x] Backtest a long/short strategy against buy-and-hold benchmark
 - [x] Beta against S&P 500
 - [x] Sharpe Ratio (daily and annualized)
+
+### Notebook Refactor
+- [x] Split `main.ipynb` into three focused notebooks (`01_eda`, `02_models`, `03_backtesting`)
+- [x] Added CSV handoff between notebooks via `data/features.csv` and `data/predictions.csv`
 
 ### Next Steps
 - [ ] Expand dataset from 1 year to 5 years (`period='5y'`) — increases training rows from ~175 to ~1,000 and test days from ~45 to ~250, making all metrics statistically meaningful
