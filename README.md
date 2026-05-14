@@ -104,6 +104,7 @@ The project is split into three notebooks that must be run in order. Each notebo
 | `notebooks/02_models.ipynb` | Train/test split, linear regression, random forest, XGBoost | `data/predictions.csv` |
 | `notebooks/03_backtesting.ipynb` | Long/short strategy, equity curve, beta, Sharpe, Sortino, drawdown, win rate, alpha, regime analysis | — |
 | `notebooks/04_multiticker.ipynb` | Linear regression pipeline across AAPL, MSFT, GOOGL, SPY — generalisation check | — |
+| `notebooks/05_lstm.ipynb` | LSTM from scratch (numpy), then PyTorch with GPU acceleration | — |
 
 ---
 
@@ -156,6 +157,7 @@ jupyter notebook notebooks/03_backtesting.ipynb
 - [x] Linear Regression — Normal Equation, from scratch (baseline)
 - [x] Random Forest — from scratch + sklearn comparison + grid search hyperparameter tuning
 - [x] XGBoost — C++ from scratch (pybind11 extension) + sklearn comparison
+- [ ] LSTM — numpy from scratch first, then PyTorch with GPU (RTX 5080)
 
 ### Evaluation
 - [x] Plot predicted vs actual returns for all models
@@ -178,4 +180,5 @@ jupyter notebook notebooks/03_backtesting.ipynb
 - [x] Alpha and Information Ratio — alpha 0.0075/day, IR 0.51
 - [x] Regime Analysis — bull vs bear market performance, strategy profitable in both regimes
 - [x] Multi-ticker testing — Test R² 0.45–0.54 across AAPL, MSFT, GOOGL, SPY; signal generalises
-- [ ] LSTM — implement a Long Short-Term Memory neural network from scratch; LSTMs are designed for sequential data and can capture temporal dependencies across many timesteps that tree-based models and linear regression cannot
+- [ ] LSTM numpy from scratch — implement forward pass (4 gates: forget, input, cell, output), BPTT, training loop in `05_lstm.ipynb`
+- [ ] LSTM PyTorch with GPU — re-implement using PyTorch on RTX 5080, compare training speed and Test R² against numpy version and linear regression baseline
