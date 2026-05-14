@@ -142,6 +142,8 @@ jupyter notebook notebooks/03_backtesting.ipynb
 - [x] Backtest a long/short strategy against buy-and-hold benchmark
 - [x] Beta against S&P 500
 - [x] Sharpe Ratio (daily and annualized)
+- [x] Max Drawdown — rolling drawdown from peak, worst single trough
+- [x] Win Rate — overall and rolling 20-day win rate vs 50% baseline
 
 ### Notebook Refactor
 - [x] Split `main.ipynb` into three focused notebooks (`01_eda`, `02_models`, `03_backtesting`)
@@ -150,5 +152,6 @@ jupyter notebook notebooks/03_backtesting.ipynb
 ### Next Steps
 - [x] Expand dataset from 1 year to 5 years — test set grew to 201 days, all metrics now statistically meaningful
 - [x] Re-evaluate all models on the larger dataset
-- [ ] Additional backtesting metrics — max drawdown, win rate, Sortino ratio, transaction cost simulation, rolling Sharpe, alpha, Information Ratio, regime analysis
+- [ ] Sortino Ratio — like Sharpe but only penalises downside volatility
 - [ ] Multi-ticker testing — run the same model and strategy on other stocks (MSFT, GOOGL, SPY) to test if the signal generalises beyond AAPL
+- [ ] LSTM — implement a Long Short-Term Memory neural network from scratch; LSTMs are designed for sequential data and can capture temporal dependencies across many timesteps that tree-based models and linear regression cannot
