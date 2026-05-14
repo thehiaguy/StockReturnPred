@@ -55,6 +55,15 @@ Pulling historical price data with yfinance, creating features like moving avera
 - **Win Rate > 50%** throughout the test period — the model gets the direction right more than half the time consistently, not just on a few lucky days.
 - **Daily Sortino = 1.25, Annual = 19.84** — higher than Sharpe because Sortino only penalises losing days. The gap between Sortino and Sharpe indicates the strategy's volatility is mostly on the upside, which is desirable.
 - **Transaction costs (5 bps/trade):** gross return ~246%, net return ~228% — an 18 percentage point drag from trading fees over 201 days.
+- **Rolling Sharpe** — 30-day rolling window stays consistently positive throughout the test period, confirming the edge is stable and not driven by a few lucky stretches.
+- **Alpha = 0.0075, Information Ratio = 0.51** — the strategy earns 0.75% per day above what market exposure predicts. IR of 0.51 is in the "good" range, meaning the active risk taken is being rewarded.
+- **Regime Analysis** — bear regime win rate (76.1%) and mean return (0.0092) are both higher than bull regime (69.8%, 0.0066), confirming the strategy profits from short signals in down markets and is not market-dependent.
+
+### Multi-Ticker Testing
+- Ran the same linear regression pipeline on AAPL, MSFT, GOOGL, and SPY to test if the signal generalises beyond a single stock.
+- **Test R² between 0.45–0.54 across all four tickers** — consistent performance with almost no train/test gap, confirming the feature set captures a real and generalisable signal.
+- GOOGL produced the highest cumulative return (7.7x) due to higher volatility — correct directional calls on a volatile stock produce larger gains.
+- SPY produced the lowest cumulative return (1.4x) because it is a low-volatility index ETF — same win rate, smaller per-day gains.
 
 ---
 
@@ -92,7 +101,8 @@ The project is split into three notebooks that must be run in order. Each notebo
 |----------|-------------|-------|
 | `notebooks/01_eda.ipynb` | Data loading, SMA/EMA, feature engineering, visualizations | `data/features.csv` |
 | `notebooks/02_models.ipynb` | Train/test split, linear regression, random forest, XGBoost | `data/predictions.csv` |
-| `notebooks/03_backtesting.ipynb` | Long/short strategy, equity curve, beta, Sharpe ratio | — |
+| `notebooks/03_backtesting.ipynb` | Long/short strategy, equity curve, beta, Sharpe, Sortino, drawdown, win rate, alpha, regime analysis | — |
+| `notebooks/04_multiticker.ipynb` | Linear regression pipeline across AAPL, MSFT, GOOGL, SPY — generalisation check | — |
 
 ---
 
@@ -163,8 +173,8 @@ jupyter notebook notebooks/03_backtesting.ipynb
 ### Next Steps
 - [x] Expand dataset from 1 year to 5 years — test set grew to 201 days, all metrics now statistically meaningful
 - [x] Re-evaluate all models on the larger dataset
-- [ ] Rolling Sharpe — 30-day rolling window to check if edge is consistent over time
-- [ ] Alpha and Information Ratio — returns above what market exposure explains
-- [ ] Regime Analysis — bull vs bear market performance, quarterly returns
-- [ ] Multi-ticker testing — run the same model and strategy on other stocks (MSFT, GOOGL, SPY) to test if the signal generalises beyond AAPL
+- [x] Rolling Sharpe — 30-day rolling window, edge is consistent throughout test period
+- [x] Alpha and Information Ratio — alpha 0.0075/day, IR 0.51
+- [x] Regime Analysis — bull vs bear market performance, strategy profitable in both regimes
+- [x] Multi-ticker testing — Test R² 0.45–0.54 across AAPL, MSFT, GOOGL, SPY; signal generalises
 - [ ] LSTM — implement a Long Short-Term Memory neural network from scratch; LSTMs are designed for sequential data and can capture temporal dependencies across many timesteps that tree-based models and linear regression cannot
