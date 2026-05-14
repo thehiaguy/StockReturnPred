@@ -65,6 +65,13 @@ Pulling historical price data with yfinance, creating features like moving avera
 - GOOGL produced the highest cumulative return (7.7x) due to higher volatility — correct directional calls on a volatile stock produce larger gains.
 - SPY produced the lowest cumulative return (1.4x) because it is a low-volatility index ETF — same win rate, smaller per-day gains.
 
+### LSTM (in progress)
+- A standard neural network treats every input independently with no memory of previous days — useless for time series where sequence matters.
+- An RNN fixes this with a hidden state passed between time steps, but gradients vanish over long sequences so it can't learn patterns spanning more than ~10 steps.
+- An LSTM fixes the vanishing gradient problem with two states: **`h`** (short-term hidden state) and **`c`** (long-term cell state that flows through time with only small controlled changes).
+- The 4 gates control memory: **forget** (how much old memory to keep), **input** (how much new info to write), **cell/candidate** (what new info to write), **output** (what to expose as the hidden state).
+- Sigmoid is used on gates as a continuous 0–1 valve (not a probability); tanh is used for content values since returns can be positive or negative.
+
 ---
 
 ## Results
@@ -157,7 +164,8 @@ jupyter notebook notebooks/03_backtesting.ipynb
 - [x] Linear Regression — Normal Equation, from scratch (baseline)
 - [x] Random Forest — from scratch + sklearn comparison + grid search hyperparameter tuning
 - [x] XGBoost — C++ from scratch (pybind11 extension) + sklearn comparison
-- [ ] LSTM — numpy from scratch first, then PyTorch with GPU (RTX 5080)
+- [x] LSTM — numpy from scratch: forward pass, BPTT, and training loop implemented in `05_lstm.ipynb`
+- [ ] LSTM — PyTorch with GPU (RTX 5080)
 
 ### Evaluation
 - [x] Plot predicted vs actual returns for all models
@@ -180,5 +188,6 @@ jupyter notebook notebooks/03_backtesting.ipynb
 - [x] Alpha and Information Ratio — alpha 0.0075/day, IR 0.51
 - [x] Regime Analysis — bull vs bear market performance, strategy profitable in both regimes
 - [x] Multi-ticker testing — Test R² 0.45–0.54 across AAPL, MSFT, GOOGL, SPY; signal generalises
-- [ ] LSTM numpy from scratch — implement forward pass (4 gates: forget, input, cell, output), BPTT, training loop in `05_lstm.ipynb`
+- [x] LSTM numpy from scratch — forward pass (4 gates), BPTT, and training loop implemented in `05_lstm.ipynb`
+- [ ] Load features data and run training loop — verify loss decreases over epochs
 - [ ] LSTM PyTorch with GPU — re-implement using PyTorch on RTX 5080, compare training speed and Test R² against numpy version and linear regression baseline
