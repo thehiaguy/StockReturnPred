@@ -2,16 +2,15 @@
 Lag1: -0.477678
 Lag2: -0.499647
 Lag3: -0.516768
-Vol_5day: 0.208448
-Vol_30day: -0.056640
+Vol_5day: 0.208449
+Vol_30day: -0.056641
 Momentum_5days: 2.451736
-Momentum_30days: 0.271803
-Momentum_252days: 0.644403
+Momentum_30days: 0.271802
+Momentum_252days: 0.644401
 
 === Model Results ===
-Linear Regression   | MSE: 0.000110 | Train RÂ²: 0.4649 | Test RÂ²: 0.4958
-RF from scratch     | MSE: 0.000172 | Train RÂ²: 0.4409 | Test RÂ²: 0.2133
-RF grid search      | MSE: 0.000168 | Train RÂ²: 0.4012 | Test RÂ²: 0.2281
-sklearn RF          | MSE: 0.000153 | Train RÂ²: 0.5398 | Test RÂ²: 0.3001
-C++ XGBoost         | MSE: 0.000135 | Train RÂ²: 0.7877 | Test RÂ²: 0.3831
-sklearn XGBoost     | MSE: 0.000135 | Train RÂ²: 0.7799 | Test RÂ²: 0.3807
+Linear Regression   | MSE: 0.000110 | Train R²: 0.4649 | Test R²: 0.4958
+RF from scratch     | MSE: 0.000173 | Train R²: 0.4495 | Test R²: 0.2074
+RF grid search      | MSE: 0.000167 | Train R²: 0.4883 | Test R²: 0.2330
+sklearn RF          | MSE: 0.000153 | Train R²: 0.5400 | Test R²: 0.3004
+sklearn XGBoost     | MSE: 0.000135 | Train R²: 0.7799 | Test R²: 0.3807

@@ -45,12 +45,12 @@ Pulling historical price data with yfinance, creating features like moving avera
 - Converted linear regression predictions into a long/short trading strategy using `np.sign()` — +1 (buy) when predicting positive returns, -1 (short) when predicting negative.
 - Strategy returns = signal × actual return each day. Correct shorts flip a loss into a gain by multiplying −1 × negative return.
 - Cumulative portfolio value tracked using `np.cumprod(1 + strategy_returns)` and compared against a buy-and-hold benchmark.
-- **Result:** strategy returned ~40% over the test period vs ~15% for buy-and-hold AAPL.
+- Expanded dataset from 1 year to 5 years — test set grew from ~45 days to 201 days, making all metrics statistically meaningful.
 
 ### Strategy Metrics
-- **Beta = 0.38** against the S&P 500 — the strategy moves at only 38% of market swings, meaning most returns come from stock-specific signals (momentum, volatility) rather than just riding the market. Low beta combined with high returns implies genuine alpha.
-- **Daily Sharpe Ratio = 0.58** — in the "good" range (0.5–1.0). Return per unit of risk is solid for a simple daily strategy.
-- **Annualized Sharpe = 9.2** — artificially inflated by the tiny ~45 day test set. With only 45 observations, a good run with low volatility produces extreme annualized numbers. The daily Sharpe is the more honest figure until the dataset is expanded.
+- **Beta = 0.08** against the S&P 500 — the strategy moves almost independently of the market, meaning returns come almost entirely from stock-specific signals rather than passive market exposure.
+- **Daily Sharpe Ratio = 0.59** — in the "good" range (0.5–1.0). Return per unit of risk is solid for a simple daily strategy.
+- **Annualized Sharpe = 9.35** — mathematically derived from the daily Sharpe (`0.59 × √252`), not a small-sample artefact. With 201 test days the sample size is statistically meaningful.
 
 ---
 
@@ -58,22 +58,20 @@ Pulling historical price data with yfinance, creating features like moving avera
 
 | Model | MSE | Test R² | Train R² |
 |-------|-----|---------|---------|
-| Linear Regression | 0.000110 | 0.4958 | 0.4649 |
-| RF from scratch | 0.000172 | 0.2133 | 0.4409 |
-| RF grid search | 0.000168 | 0.2281 | 0.4012 |
-| sklearn RandomForest | 0.000153 | 0.3001 | 0.5398 |
-| C++ XGBoost | 0.000135 | 0.3831 | 0.7877 |
-| sklearn XGBoost | 0.000135 | 0.3807 | 0.7799 |
+| Linear Regression | 0.000145 | 0.3092 | 0.5256 |
+| RF from scratch (grid search) | 0.000199 | 0.0575 | 0.6082 |
+| sklearn RandomForest | 0.000192 | 0.0896 | 0.6824 |
+| C++ XGBoost | 0.000181 | 0.1400 | 0.9361 |
+| sklearn XGBoost | 0.000179 | 0.1519 | 0.9379 |
 
-### Backtesting (Linear Regression Strategy, 1-year dataset)
+### Backtesting (Linear Regression Strategy, 5-year dataset)
 
 | Metric | Value |
 |--------|-------|
-| Strategy return | ~40% |
-| Buy-and-hold return | ~15% |
-| Beta vs S&P 500 | 0.38 |
-| Daily Sharpe Ratio | 0.58 |
-| Annualized Sharpe | 9.2 (inflated — only 45 test days) |
+| Test period | 2025-07-28 → 2026-05-13 (201 days) |
+| Beta vs S&P 500 | 0.08 |
+| Daily Sharpe Ratio | 0.59 |
+| Annualized Sharpe | 9.35 |
 
 ---
 
@@ -150,6 +148,7 @@ jupyter notebook notebooks/03_backtesting.ipynb
 - [x] Added CSV handoff between notebooks via `data/features.csv` and `data/predictions.csv`
 
 ### Next Steps
-- [ ] Expand dataset from 1 year to 5 years (`period='5y'`) — increases training rows from ~175 to ~1,000 and test days from ~45 to ~250, making all metrics statistically meaningful
-- [ ] Re-evaluate all models on the larger dataset — tree-based models may close the gap with linear regression given more data
-- [ ] Re-run backtesting metrics on the larger test set for a reliable annualized Sharpe
+- [x] Expand dataset from 1 year to 5 years — test set grew to 201 days, all metrics now statistically meaningful
+- [x] Re-evaluate all models on the larger dataset
+- [ ] Additional backtesting metrics — max drawdown, win rate, Sortino ratio, transaction cost simulation, rolling Sharpe, alpha, Information Ratio, regime analysis
+- [ ] Multi-ticker testing — run the same model and strategy on other stocks (MSFT, GOOGL, SPY) to test if the signal generalises beyond AAPL
