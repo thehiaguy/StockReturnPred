@@ -51,6 +51,10 @@ Pulling historical price data with yfinance, creating features like moving avera
 - **Beta = 0.08** against the S&P 500 — the strategy moves almost independently of the market, meaning returns come almost entirely from stock-specific signals rather than passive market exposure.
 - **Daily Sharpe Ratio = 0.59** — in the "good" range (0.5–1.0). Return per unit of risk is solid for a simple daily strategy.
 - **Annualized Sharpe = 9.35** — mathematically derived from the daily Sharpe (`0.59 × √252`), not a small-sample artefact. With 201 test days the sample size is statistically meaningful.
+- **Max Drawdown = -3.50%** — the worst peak-to-trough drop over the entire test period. Very low for a daily trading strategy.
+- **Win Rate > 50%** throughout the test period — the model gets the direction right more than half the time consistently, not just on a few lucky days.
+- **Daily Sortino = 1.25, Annual = 19.84** — higher than Sharpe because Sortino only penalises losing days. The gap between Sortino and Sharpe indicates the strategy's volatility is mostly on the upside, which is desirable.
+- **Transaction costs (5 bps/trade):** gross return ~246%, net return ~228% — an 18 percentage point drag from trading fees over 201 days.
 
 ---
 
@@ -70,8 +74,13 @@ Pulling historical price data with yfinance, creating features like moving avera
 |--------|-------|
 | Test period | 2025-07-28 → 2026-05-13 (201 days) |
 | Beta vs S&P 500 | 0.08 |
-| Daily Sharpe Ratio | 0.59 |
+| Daily Sharpe | 0.59 |
 | Annualized Sharpe | 9.35 |
+| Daily Sortino | 1.25 |
+| Annualized Sortino | 19.84 |
+| Max Drawdown | -3.50% |
+| Gross Return | ~246% |
+| Net Return (5 bps/trade) | ~228% |
 
 ---
 
@@ -144,6 +153,8 @@ jupyter notebook notebooks/03_backtesting.ipynb
 - [x] Sharpe Ratio (daily and annualized)
 - [x] Max Drawdown — rolling drawdown from peak, worst single trough
 - [x] Win Rate — overall and rolling 20-day win rate vs 50% baseline
+- [x] Sortino Ratio — daily (1.25) and annualized (19.84), only penalises downside volatility
+- [x] Transaction Cost Simulation — 5 bps/trade, gross vs net equity curve comparison
 
 ### Notebook Refactor
 - [x] Split `main.ipynb` into three focused notebooks (`01_eda`, `02_models`, `03_backtesting`)
@@ -152,6 +163,8 @@ jupyter notebook notebooks/03_backtesting.ipynb
 ### Next Steps
 - [x] Expand dataset from 1 year to 5 years — test set grew to 201 days, all metrics now statistically meaningful
 - [x] Re-evaluate all models on the larger dataset
-- [ ] Sortino Ratio — like Sharpe but only penalises downside volatility
+- [ ] Rolling Sharpe — 30-day rolling window to check if edge is consistent over time
+- [ ] Alpha and Information Ratio — returns above what market exposure explains
+- [ ] Regime Analysis — bull vs bear market performance, quarterly returns
 - [ ] Multi-ticker testing — run the same model and strategy on other stocks (MSFT, GOOGL, SPY) to test if the signal generalises beyond AAPL
 - [ ] LSTM — implement a Long Short-Term Memory neural network from scratch; LSTMs are designed for sequential data and can capture temporal dependencies across many timesteps that tree-based models and linear regression cannot
