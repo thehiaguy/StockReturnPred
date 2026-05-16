@@ -5,3 +5,5 @@ numpy
 seaborn
 scikit-learn
 xgboost
+pybind11
+torch
